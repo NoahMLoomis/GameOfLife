@@ -14,7 +14,6 @@ class Grid:
         for cell in self.grid:
             print(f'{cell[0]:^10}{cell[1]:^10}{cell[2]:^10}')
             
-            
     def change_alive_status(self, cell):
         # cell = self.get_cell(x_pos, y_pos)
         if  self.get_cell_alive_status(cell) == 0:

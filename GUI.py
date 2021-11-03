@@ -11,8 +11,7 @@ class GUI:
         self.grid_area_positions = []
         self.screen_size = screen_size
 
-        self.game_of_life = GameOfLife(
-            universe_size=6, game_grid=Grid(grid_size))
+        self.game_of_life = GameOfLife(game_grid=Grid(grid_size))
 
         self.size_of_square = self.screen_size / self.game_of_life.game_grid.rows
 
@@ -29,13 +28,13 @@ class GUI:
 
         self.wn.listen()
         self.wn.onclick(self.click_cell)
-        
+
         self.draw_grid()
 
     def r_press(self):
         self.game_of_life.populate_randomized()
         self.draw_grid()
-        
+
     def s_press(self):
         self.game_of_life.play_sequence()
         self.draw_grid()
@@ -91,6 +90,7 @@ class GUI:
     def quit(self):
         self.wn.bye()
 
-
-g = GUI(grid_size=10)
-tkinter.mainloop()
+if __name__ == "__main__":
+    
+    g = GUI(grid_size=10)
+    tkinter.mainloop()
