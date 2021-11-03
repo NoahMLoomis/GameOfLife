@@ -1,5 +1,6 @@
 from Grid import Grid
-import random, copy
+import random
+import copy
 
 
 class GameOfLife:
@@ -25,8 +26,8 @@ class GameOfLife:
     def check_death_conditions(self, index, grid_copy):
         x_pos = grid_copy.grid[index][0]
         y_pos = grid_copy.grid[index][1]
-        
-        left = grid_copy.get_cell(x_pos - 1 , y_pos)
+
+        left = grid_copy.get_cell(x_pos - 1, y_pos)
         right = grid_copy.get_cell(x_pos + 1, y_pos + 1)
         top = grid_copy.get_cell(x_pos, y_pos + 1)
         bottom = grid_copy.get_cell(x_pos, y_pos - 1)
@@ -34,12 +35,13 @@ class GameOfLife:
         right_bot_diag = grid_copy.get_cell(x_pos + 1, y_pos - 1)
         left_top_diag = grid_copy.get_cell(x_pos, y_pos + 1)
         right_top_diag = grid_copy.get_cell(x_pos + 1, y_pos + 1)
-        
-        all_checks = [left, right, top, bottom, left_bot_diag, right_bot_diag, left_top_diag, right_top_diag]
-        
+
+        all_checks = [left, right, top, bottom, left_bot_diag,
+                      right_bot_diag, left_top_diag, right_top_diag]
+
         alive_count = 0
         for cell in all_checks:
-            if cell != None and cell[2] == 1:
+            if cell[2] == 1:
                 alive_count += 1
         if alive_count > 3:
             grid_copy.kill_cell(grid_copy.grid[index])
@@ -47,7 +49,7 @@ class GameOfLife:
             grid_copy.revive_cell(grid_copy.grid[index])
         else:
             grid_copy.kill_cell(grid_copy.grid[index])
-            
+
 # g = GameOfLife()
 # g.create_grid()
 # g.populate_randomized()
