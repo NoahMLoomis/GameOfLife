@@ -1,22 +1,31 @@
-import turtle
 import tkinter
+import turtle
+from tkinter import *
+from tkinter import messagebox
 
 from GameOfLife import GameOfLife
 from Grid import Grid
+from FileReading import FileReading
 
+
+class InvalidInputException(BaseException):
+    pass
 
 class GUI:
-    def __init__(self, screen_size=600, grid_size=10):
+    def __init__(self, t, wn, screen_size=600, grid_size=10, grid = None):
         self.grid_size = grid_size
         self.grid_area_positions = []
         self.screen_size = screen_size
-
-        self.game_of_life = GameOfLife(game_grid=Grid(grid_size))
-
+        
+        if grid == None:
+            self.game_of_life = GameOfLife(game_grid=Grid(rows=grid_size))
+        else:
+            self.game_of_life = GameOfLife(game_grid=Grid(grid=grid, rows=grid_size))
+            
         self.size_of_square = self.screen_size / self.game_of_life.game_grid.rows
 
-        self.t = turtle.Turtle(visible=False)
-        self.wn = turtle.Screen()
+        self.t = t
+        self.wn = wn
         self.wn.setup(self.screen_size + 100, self.screen_size + 100)
         self.wn.tracer(0)
 
@@ -75,8 +84,8 @@ class GUI:
                 self.draw_square(start_x, start_y, self.size_of_square,
                                  self.game_of_life.game_grid.get_cell(row, col)[2])
 
-                # This appends the areas that each square occupies, and the cell associated with it
-                # Needed for the click_cell
+                # This appends the areas that each square occupies,
+                # and the cell associated with it, needed for the click_cell
                 self.grid_area_positions.append((
                     start_x,
                     start_x + self.size_of_square,
@@ -91,6 +100,27 @@ class GUI:
         self.wn.bye()
 
 if __name__ == "__main__":
+    t = turtle.Turtle(visible=False)
+    wn = turtle.Screen()
     
-    g = GUI(grid_size=10)
-    tkinter.mainloop()
+    while True:
+        try:
+            num_rows = wn.textinput("Enter the number of rows/cols your want, or the name of a file", "promptVal")
+            num_rows = int(num_rows)
+            if num_rows < 3 or num_rows > 20:
+                raise InvalidInputException("Number cannot be less than 3 or greater than 20")
+
+            g = GUI(grid_size=num_rows, t=t, wn=wn)
+            
+        except ValueError:
+            try:
+                f = FileReading(num_rows)
+                g = GUI(grid=f.transform_to_grid(), grid_size=f.rows, t=t, wn=wn)
+            except FileNotFoundError as msg:
+                messagebox.showerror("Invalid Input", msg)
+        except InvalidInputException as msg:
+            messagebox.showerror("Invalid Input", msg)
+        except TclError:
+            break
+        
+        tkinter.mainloop()
