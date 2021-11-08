@@ -5,10 +5,10 @@ class InvalidFileFormatException(BaseException):
 
 class FileReading():
     def __init__(self, file_name):
-        file_path = f'lifeFiles/{file_name}'
+        file_path = f'lifeFiles/{file_name}.life'
         
-        if not os.path.isfile(f'lifeFiles/{file_name}'):
-            raise FileNotFoundError(f'The file with the name {file_name} does not exist')
+        if not os.path.isfile(file_path):
+            raise FileNotFoundError(f'The file with the name {file_name}.life does not exist')
         self.file_path = file_path
         
         self.grid = self.parse_file_to_grid()

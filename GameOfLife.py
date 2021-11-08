@@ -114,19 +114,3 @@ class GameOfLife:
 
     def get_right_top_cell(self, x_pos, y_pos, grid_copy):
         return grid_copy.get_cell(x_pos + 1, y_pos + 1)
-# g = GameOfLife()
-# g.create_grid()
-# g.populate_randomized()
-
-# g.play_sequence()
-# print(g.game_grid)
-# g.play_sequence()
-# print(g.game_grid)
-# g.play_sequence()
-# print(g.game_grid)
-# g.play_sequence()
-# print(g.game_grid)
-# g.play_sequence()
-# print(g.game_grid)
-# g.play_sequence()
-# print(g.game_grid)

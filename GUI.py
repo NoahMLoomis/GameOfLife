@@ -2,6 +2,7 @@ import tkinter
 import turtle
 from tkinter import *
 from tkinter import messagebox
+import time
 
 from GameOfLife import GameOfLife
 from Grid import Grid
@@ -11,17 +12,23 @@ from FileReading import FileReading
 class InvalidInputException(BaseException):
     pass
 
+
+class PausedException(BaseException):
+    pass
+
+
 class GUI:
-    def __init__(self, t, wn, screen_size=600, grid_size=10, grid = None):
+    def __init__(self, t, wn, screen_size=600, grid_size=10, grid=None):
         self.grid_size = grid_size
         self.grid_area_positions = []
         self.screen_size = screen_size
-        
+
         if grid == None:
             self.game_of_life = GameOfLife(game_grid=Grid(rows=grid_size))
         else:
-            self.game_of_life = GameOfLife(game_grid=Grid(grid=grid, rows=grid_size))
-            
+            self.game_of_life = GameOfLife(
+                game_grid=Grid(grid=grid, rows=grid_size))
+
         self.size_of_square = self.screen_size / self.game_of_life.game_grid.rows
 
         self.t = t
@@ -29,11 +36,13 @@ class GUI:
         self.wn.setup(self.screen_size + 100, self.screen_size + 100)
         self.wn.tracer(0)
 
-        self.wn.onkey(self.quit, 'q')
-        self.wn.onkey(self.s_press, 's')
-        self.wn.onkey(self.r_press, 'r')
+        
 
-        # self.wn.ontimer()
+        self.wn.onkey(self.quit, 'q')
+        self.wn.onkey(self.loop, 's')
+        self.wn.onkey(self.r_press, 'r')
+        self.wn.onkey(self.p_press, 'p')
+
 
         self.wn.listen()
         self.wn.onclick(self.click_cell)
@@ -43,6 +52,17 @@ class GUI:
     def r_press(self):
         self.game_of_life.populate_randomized()
         self.draw_grid()
+    
+    def p_press(self):
+        raise PausedException()
+
+    def loop(self):
+        while True:
+            time.sleep(0.5)
+            try:
+                self.wn.ontimer(fun=self.s_press, t=1)
+            except PausedException:
+                print("Paused")
 
     def s_press(self):
         self.game_of_life.play_sequence()
@@ -99,28 +119,42 @@ class GUI:
     def quit(self):
         self.wn.bye()
 
+
 if __name__ == "__main__":
     t = turtle.Turtle(visible=False)
     wn = turtle.Screen()
     
+    root = Tk()
+    root.geometry("400x400")
+    
+    frame = Frame(root, width=500, height=400, bd=1)
+    frame.pack()
+    
+    lbl_r = Label(frame, text="R: Randomly populate the grid\nS: Start the Game\nP: Pause the Game\nQ: Quit the game")
+    
+    lbl_r.pack(side='left')
+    
     while True:
         try:
-            num_rows = wn.textinput("Enter the number of rows/cols your want, or the name of a file", "promptVal")
+            num_rows = wn.textinput(
+                "Enter a name of a file, or number", "Enter a value")
             num_rows = int(num_rows)
             if num_rows < 3 or num_rows > 20:
-                raise InvalidInputException("Number cannot be less than 3 or greater than 20")
+                raise InvalidInputException(
+                    "Number cannot be less than 3 or greater than 20")
 
             g = GUI(grid_size=num_rows, t=t, wn=wn)
-            
+
         except ValueError:
             try:
                 f = FileReading(num_rows)
-                g = GUI(grid=f.transform_to_grid(), grid_size=f.rows, t=t, wn=wn)
+                g = GUI(grid=f.transform_to_grid(),
+                        grid_size=f.rows, t=t, wn=wn)
             except FileNotFoundError as msg:
                 messagebox.showerror("Invalid Input", msg)
         except InvalidInputException as msg:
             messagebox.showerror("Invalid Input", msg)
-        except TclError:
+        except (TclError, TypeError):
             break
-        
+
         tkinter.mainloop()
